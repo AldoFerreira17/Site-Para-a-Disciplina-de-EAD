@@ -4,59 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minicurso: Autoria e IA</title>
+    <!-- Importando fonte moderna do Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #2563eb;
+            --hover-color: #1d4ed8;
+            --text-main: #334155;
+            --text-dark: #0f172a;
+        }
+        
         body { 
-            font-family: Arial, sans-serif; 
-            text-align: center; 
+            font-family: 'Inter', sans-serif; 
             margin: 0; 
-            padding: 20px; 
-            background-color: #f4f4f9; 
-            color: #333;
+            padding: 40px 20px; 
+            /* Fundo com degradê suave */
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); 
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        .container { 
+
+        .card { 
             max-width: 800px; 
-            margin: 0 auto; 
+            width: 100%;
             background: #ffffff; 
-            padding: 30px; 
-            border-radius: 8px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            padding: 40px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
+            text-align: center; 
         }
-        h1 { font-size: 1.5em; color: #2c3e50; }
-        p { font-size: 1.1em; margin-bottom: 25px; line-height: 1.5; }
-        iframe { 
-            width: 100%; 
-            height: 450px; 
-            border: none; 
-            border-radius: 8px; 
-            margin-bottom: 25px; 
+
+        .tag {
+            display: inline-block;
+            background-color: #eff6ff;
+            color: var(--primary-color);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
+        h1 { 
+            font-size: 2em; 
+            color: var(--text-dark);
+            margin: 0 0 15px 0;
+            line-height: 1.2;
+            font-weight: 800;
+        }
+
+        p { 
+            font-size: 1.1em; 
+            margin-bottom: 30px; 
+            line-height: 1.6; 
+        }
+
+        /* Hack CSS para manter o vídeo sempre em proporção 16:9 */
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* Proporção 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
         .btn { 
             display: inline-block; 
-            padding: 12px 24px; 
-            background-color: #0056b3; 
+            padding: 14px 28px; 
+            background-color: var(--primary-color); 
             color: #ffffff; 
             text-decoration: none; 
-            border-radius: 5px; 
-            font-weight: bold;
-            transition: background 0.3s;
+            border-radius: 8px; 
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
-        .btn:hover { background-color: #004494; }
+
+        .btn:hover { 
+            background-color: var(--hover-color); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
         
-        /* Ajuste para telas de celular */
+        /* Ajustes para telas menores (celulares) */
         @media (max-width: 600px) {
-            iframe { height: 250px; }
+            body { padding: 20px 15px; }
+            .card { padding: 25px 20px; }
+            h1 { font-size: 1.6em; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="card">
+        <span class="tag">Minicurso EaD</span>
         <h1>Autoria e uso responsável de recursos digitais e IA</h1>
         <p>Siga o passo a passo no vídeo abaixo para aprender a utilizar materiais educacionais com atenção às fontes, licenças e transparência.</p>
 
-        <!-- Substitua o ID "SEU_ID_AQUI" pelo código real do seu vídeo no YouTube -->
-        <iframe src="https://www.youtube.com/embed/SEU_ID_AQUI" allowfullscreen></iframe>
+        <div class="video-container">
+            <!-- Substitua o ID "SEU_ID_AQUI" pelo código real do seu vídeo no YouTube -->
+            <iframe src="https://www.youtube.com/embed/SEU_ID_AQUI" allowfullscreen></iframe>
+        </div>
 
-        <!-- Substitua o "#" pelo link do Google Forms, H5P ou outra ferramenta de avaliação -->
+        <!-- Substitua o "#" pelo link da sua avaliação -->
         <a href="#" target="_blank" class="btn">Acessar Avaliação Interativa</a>
     </div>
 </body>
