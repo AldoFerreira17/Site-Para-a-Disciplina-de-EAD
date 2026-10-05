@@ -4,75 +4,170 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minicurso: Autoria e IA</title>
-    <!-- Importando fonte moderna do Google -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #2563eb;
-            --hover-color: #1d4ed8;
+            --primary-color: #0284c7;
+            --hover-color: #0369a1;
             --text-main: #334155;
             --text-dark: #0f172a;
+            --bg-light: #f8fafc;
         }
         
         body { 
             font-family: 'Inter', sans-serif; 
             margin: 0; 
             padding: 40px 20px; 
-            /* Fundo com degradê suave */
-            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); 
+            background: linear-gradient(135deg, #e0f2fe 0%, #93c5fd 100%); 
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; 
         }
 
         .card { 
             max-width: 800px; 
             width: 100%;
             background: #ffffff; 
-            padding: 40px; 
-            border-radius: 16px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05); 
-            text-align: center; 
+            padding: 45px; 
+            border-radius: 24px; 
+            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15); 
         }
+
+        .header { text-align: center; margin-bottom: 35px; }
 
         .tag {
             display: inline-block;
-            background-color: #eff6ff;
+            background-color: #e0f2fe;
             color: var(--primary-color);
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85em;
-            font-weight: 600;
+            font-weight: 800;
             margin-bottom: 15px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
         }
 
         h1 { 
-            font-size: 2em; 
+            font-size: 2.4em; 
             color: var(--text-dark);
             margin: 0 0 15px 0;
             line-height: 1.2;
             font-weight: 800;
         }
 
-        p { 
+        .subtitle { 
             font-size: 1.1em; 
-            margin-bottom: 30px; 
             line-height: 1.6; 
+            color: var(--text-main);
+            max-width: 700px;
+            margin: 0 auto;
         }
 
-        /* Hack CSS para manter o vídeo sempre em proporção 16:9 */
+        /* Estilos dos Botões Expansíveis (Accordions) */
+        .accordion-group {
+            margin-bottom: 35px;
+        }
+
+        details {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+
+        details:hover {
+            border-color: #bae6fd;
+        }
+
+        details[open] {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.1);
+        }
+
+        summary {
+            padding: 18px 20px;
+            font-weight: 600;
+            font-size: 1.05em;
+            color: var(--text-dark);
+            cursor: pointer;
+            list-style: none; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            transition: background 0.3s ease;
+        }
+
+        summary::-webkit-details-marker {
+            display: none; 
+        }
+
+        summary:hover {
+            background: #f1f5f9;
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.5em;
+            font-weight: 400;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+            line-height: 1;
+        }
+
+        details[open] summary::after {
+            content: '−';
+            transform: rotate(180deg);
+        }
+
+        .details-content {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .details-content p {
+            margin: 0;
+        }
+
+        .details-content ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .details-content li {
+            margin-bottom: 12px;
+        }
+        .details-content li:last-child {
+            margin-bottom: 0;
+        }
+        
+        .details-content a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .details-content a:hover {
+            text-decoration: underline;
+            color: var(--hover-color);
+        }
+
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; /* Proporção 16:9 */
+            padding-bottom: 56.25%; 
             height: 0;
             overflow: hidden;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            margin-bottom: 35px;
         }
 
         .video-container iframe {
@@ -84,46 +179,130 @@
             border: none;
         }
 
+        .actions { text-align: center; }
+
+        .actions p {
+            margin-bottom: 20px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
         .btn { 
             display: inline-block; 
-            padding: 14px 28px; 
+            padding: 16px 32px; 
             background-color: var(--primary-color); 
             color: #ffffff; 
             text-decoration: none; 
-            border-radius: 8px; 
+            border-radius: 50px; 
             font-weight: 600;
             font-size: 1.1em;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
         }
 
         .btn:hover { 
             background-color: var(--hover-color); 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+            transform: scale(1.05); 
+            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        }
+
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #64748b;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
         }
         
-        /* Ajustes para telas menores (celulares) */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             body { padding: 20px 15px; }
             .card { padding: 25px 20px; }
-            h1 { font-size: 1.6em; }
+            h1 { font-size: 1.8em; }
         }
     </style>
 </head>
 <body>
     <div class="card">
-        <span class="tag">Minicurso EaD</span>
-        <h1>Autoria e uso responsável de recursos digitais e IA</h1>
-        <p>Siga o passo a passo no vídeo abaixo para aprender a utilizar materiais educacionais com atenção às fontes, licenças e transparência.</p>
-
-        <div class="video-container">
-            <!-- Substitua o ID "SEU_ID_AQUI" pelo código real do seu vídeo no YouTube -->
-            <iframe src="https://www.youtube.com/embed/SEU_ID_AQUI" allowfullscreen></iframe>
+        
+        <div class="header">
+            <span class="tag">💡 Minicurso EaD</span>
+            <h1>Autoria e uso responsável de recursos digitais e IA</h1>
+            <p class="subtitle">Descubra como utilizar materiais educacionais e ferramentas de Inteligência Artificial com ética, atenção às fontes e transparência nos seus estudos e projetos.</p>
         </div>
 
-        <!-- Substitua o "#" pelo link da sua avaliação -->
-        <a href="#" target="_blank" class="btn">Acessar Avaliação Interativa</a>
+        <!-- Botões Expansíveis -->
+        <div class="accordion-group">
+            
+            <details>
+                <summary>🎯 Público-alvo</summary>
+                <div class="details-content">
+                    <p>Estudantes do ensino médio e técnico, educadores e pessoas interessadas em integrar tecnologia e ética no dia a dia.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>🧠 Conhecimentos prévios necessários</summary>
+                <div class="details-content">
+                    <p>Navegação básica na internet, uso de motores de busca e familiaridade inicial com ferramentas digitais.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>📚 O que você vai aprender (Objetivos)</summary>
+                <div class="details-content">
+                    <ul>
+                        <li>Identificar e respeitar diferentes tipos de licenças de uso (como Creative Commons) ao buscar materiais na internet.</li>
+                        <li>Utilizar ferramentas de Inteligência Artificial Generativa como aliadas no processo criativo, sem ferir a integridade acadêmica.</li>
+                        <li>Aplicar boas práticas de citação e transparência para referenciar corretamente as fontes e tecnologias utilizadas.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <details>
+                <summary>⏱️ Carga Horária</summary>
+                <div class="details-content">
+                    <p>Este minicurso tem uma carga horária estimada de <strong>1 hora</strong>, englobando o tempo de estudo da videoaula e a realização da atividade final de avaliação.</p>
+                </div>
+            </details>
+
+            <details>
+                <summary>⚙️ Metodologia</summary>
+                <div class="details-content">
+                    <p>O curso é totalmente <strong>assíncrono</strong>. Você tem total liberdade para assistir ao conteúdo no seu próprio ritmo, pausar quando necessário e realizar a avaliação assim que se sentir preparado.</p>
+                </div>
+            </details>
+
+        </div>
+
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/53o5CAituwY" allowfullscreen></iframe>
+        </div>
+
+        <!-- Nova Seção: Material Auxiliar logo após o vídeo -->
+        <div class="accordion-group">
+            <details>
+                <summary>🔗 Material Auxiliar (Leituras e Fontes)</summary>
+                <div class="details-content">
+                    <ul>
+                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/04/21/universidades-estabelecem-regras-para-o-uso-de-ia-na-educacao.ghtml" target="_blank">G1: Universidades estabelecem regras para o uso de IA na educação</a></li>
+                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/08/04/nas-escolas-brasileiras-pesquisadores-medem-impacto-da-inteligencia-artificial-na-vida-de-alunos-e-professores.ghtml" target="_blank">G1: Pesquisadores medem impacto da Inteligência Artificial na vida de alunos e professores</a></li>
+                        <li><a href="https://g1.globo.com/educacao/noticia/2026/09/08/quase-metade-dos-alunos-no-brasil-usa-chatbots-de-ia-para-estudar-indice-e-maior-do-que-em-paises-da-ocde.ghtml" target="_blank">G1: Quase metade dos alunos no Brasil usa chatbots de IA para estudar</a></li>
+                        <li><a href="http://commons.wikimedia.org/wiki/Main_Page" target="_blank">Wikimedia Commons: Repositório de mídias com licenças livres</a></li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+
+        <div class="actions">
+            <p>Concluiu a videoaula e as leituras? Valide seus conhecimentos abaixo:</p>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJL6fSDQj3z612PrHwA7Db6I4vCOVvsAZLwkJDj4O8Lxn4tg/viewform" target="_blank" class="btn">Acessar Avaliação Interativa 🚀</a>
+        </div>
+
+        <div class="footer">
+            Desenvolvido para a Disciplina de EaD | 2026
+        </div>
+
     </div>
 </body>
 </html>
