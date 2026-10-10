@@ -66,6 +66,23 @@
             margin: 0 auto;
         }
 
+        /* Aqui está a correção para alinhar à esquerda de forma correta */
+        .author-info {
+            margin-top: 30px;
+            padding: 15px 20px;
+            background-color: var(--bg-light);
+            border-radius: 8px;
+            display: block; 
+            text-align: left; 
+            font-size: 0.95em;
+            color: var(--text-main);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .author-info p {
+            margin: 5px 0;
+        }
+
         /* Estilos dos Botões Expansíveis (Accordions) */
         .accordion-group {
             margin-bottom: 35px;
@@ -229,25 +246,26 @@
             <span class="tag">💡 Minicurso EaD</span>
             <h1>Autoria e uso responsável de recursos digitais e IA</h1>
             <p class="subtitle">Descubra como utilizar materiais educacionais e ferramentas de Inteligência Artificial com ética, atenção às fontes e transparência nos seus estudos e projetos.</p>
+            
+            <div class="author-info">
+                <p><strong>Autor:</strong> Aldo Ferreira</p>
+                <p><strong>Curso:</strong> Licenciatura em Computação</p>
+            </div>
         </div>
 
-        <!-- Botões Expansíveis -->
         <div class="accordion-group">
-            
             <details>
                 <summary>🎯 Público-alvo</summary>
                 <div class="details-content">
                     <p>Estudantes do ensino médio e técnico, educadores e pessoas interessadas em integrar tecnologia e ética no dia a dia.</p>
                 </div>
             </details>
-
             <details>
                 <summary>🧠 Conhecimentos prévios necessários</summary>
                 <div class="details-content">
                     <p>Navegação básica na internet, uso de motores de busca e familiaridade inicial com ferramentas digitais.</p>
                 </div>
             </details>
-
             <details>
                 <summary>📚 O que você vai aprender (Objetivos)</summary>
                 <div class="details-content">
@@ -258,28 +276,24 @@
                     </ul>
                 </div>
             </details>
-
             <details>
                 <summary>⏱️ Carga Horária</summary>
                 <div class="details-content">
                     <p>Este minicurso tem uma carga horária estimada de <strong>1 hora</strong>, englobando o tempo de estudo da videoaula e a realização da atividade final de avaliação.</p>
                 </div>
             </details>
-
             <details>
                 <summary>⚙️ Metodologia</summary>
                 <div class="details-content">
                     <p>O curso é totalmente <strong>assíncrono</strong>. Você tem total liberdade para assistir ao conteúdo no seu próprio ritmo, pausar quando necessário e realizar a avaliação assim que se sentir preparado.</p>
                 </div>
             </details>
-
         </div>
 
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/53o5CAituwY" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/lQ4g4aHptE0" allowfullscreen></iframe>
         </div>
 
-        <!-- Nova Seção: Material Auxiliar logo após o vídeo -->
         <div class="accordion-group">
             <details>
                 <summary>🔗 Material Auxiliar (Leituras e Fontes)</summary>
