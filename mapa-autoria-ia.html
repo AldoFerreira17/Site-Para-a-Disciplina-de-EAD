@@ -1,0 +1,539 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Mapa Autoria e IA</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: mapa em duas partes. À esquerda a raiz e os 5 capítulos ligados por uma linha; à direita o painel do capítulo ativo com tópicos que abrem. Em telas estreitas os capítulos viram uma fila rolável acima do painel. */
+:root {
+  --bg: #F0F0F0;
+  --surface: #FFFFFF;
+  --ink: #141414;
+  --muted: #4A4A4A;
+  --line: #C4C4C4;
+  --accent: #FFBD59;
+  --on-accent: #141414;
+  --accent-ink: #8A5200;
+  --inv-bg: #141414;
+  --inv-fg: #F5F5F5;
+  --soft: #FFF1D6;
+  --font-display: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121212;
+    --surface: #1D1D1D;
+    --ink: #F2F2F2;
+    --muted: #BABABA;
+    --line: #3D3D3D;
+    --accent: #FFBD59;
+    --on-accent: #141414;
+    --accent-ink: #FFBD59;
+    --inv-bg: #F2F2F2;
+    --inv-fg: #141414;
+    --soft: #2A2217;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121212;
+  --surface: #1D1D1D;
+  --ink: #F2F2F2;
+  --muted: #BABABA;
+  --line: #3D3D3D;
+  --accent: #FFBD59;
+  --on-accent: #141414;
+  --accent-ink: #FFBD59;
+  --inv-bg: #F2F2F2;
+  --inv-fg: #141414;
+  --soft: #2A2217;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.55;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-block: 40px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.intro { display: flex; flex-direction: column; gap: 8px; max-width: 720px; }
+.eyebrow {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-ink);
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(34px, 6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.hint { margin: 0; color: var(--muted); font-size: 18px; }
+
+.map {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+.left {
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 24px;
+}
+.root {
+  width: 220px;
+  flex: none;
+  background: var(--inv-bg);
+  color: var(--inv-fg);
+  border-radius: 20px;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.root h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.root p { margin: 0; font-size: 14px; line-height: 1.4; opacity: 0.85; }
+.link { flex: none; width: 32px; height: 2px; background: var(--ink); }
+
+.chapters {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 28px;
+  width: 290px;
+  flex: none;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.chapters::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 34px;
+  bottom: 34px;
+  width: 2px;
+  background: var(--ink);
+}
+.chapters li { position: relative; }
+.chapters li::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 50%;
+  width: 28px;
+  height: 2px;
+  background: var(--ink);
+}
+.chap {
+  width: 100%;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 1.2;
+  transition: background 160ms, border-color 160ms, transform 160ms;
+}
+.chap:hover { border-color: var(--ink); }
+.badge {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+}
+.chap-label { flex: 1; min-width: 0; }
+.chap svg { flex: none; width: 20px; height: 20px; opacity: 0; }
+.chap[aria-current="true"] {
+  background: var(--accent);
+  color: var(--on-accent);
+  border-color: var(--accent);
+}
+.chap[aria-current="true"] .badge { background: var(--inv-bg); color: var(--inv-fg); }
+.chap[aria-current="true"] svg { opacity: 1; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 8px solid var(--accent);
+  border-radius: 20px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+.panel.fade { animation: fadein 220ms ease-out; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.panel-head { display: flex; flex-direction: column; gap: 6px; }
+.panel-head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.panel-head p { margin: 0; color: var(--muted); }
+.toggle-all {
+  align-self: flex-start;
+  background: none;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 16px;
+  font-weight: 700;
+  font-size: 15px;
+}
+.toggle-all:hover { border-color: var(--ink); }
+
+.topics { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.topic { border-top: 1px solid var(--line); }
+.topic:last-child { border-bottom: 1px solid var(--line); }
+.topic h3 { margin: 0; font: inherit; }
+.topic-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 4px;
+  background: none;
+  border: 0;
+  text-align: left;
+}
+.topic-title {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 21px;
+  line-height: 1.2;
+}
+.topic-head svg {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  transition: transform 180ms;
+}
+.topic.is-open .topic-head svg { transform: rotate(180deg); }
+.topic.is-open .topic-title { color: var(--accent-ink); }
+.topic-body {
+  padding: 0 4px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 66ch;
+}
+.topic-body p { margin: 0; }
+.src { font-size: 14px; color: var(--muted); }
+.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.items li {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  background: var(--soft);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.items .k {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1.15;
+  color: var(--accent-ink);
+}
+.items .wide { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+
+.foot { margin: 0; font-size: 14px; color: var(--muted); max-width: 80ch; }
+
+@media (max-width: 1020px) {
+  .map { grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  .left { position: static; flex-direction: column; align-items: stretch; gap: 14px; }
+  .root { width: 100%; }
+  .link { display: none; }
+  .chapters {
+    width: 100%;
+    padding: 0 0 8px;
+    flex-direction: row;
+    gap: 10px;
+    overflow-x: auto;
+  }
+  .chapters::before, .chapters li::before { display: none; }
+  .chapters li { flex: none; }
+  .chap { width: auto; min-height: 0; white-space: nowrap; padding: 10px 16px 10px 10px; }
+  .chap svg { display: none; }
+}
+@media (max-width: 520px) {
+  .panel { padding: 20px 16px; }
+  .topic-title { font-size: 19px; }
+  .items li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel.fade { animation: none; }
+  .chap, .topic-head svg { transition: none; }
+}
+</style>
+
+<main class="wrap">
+  <header class="intro">
+    <p class="eyebrow">eBook de Aldo Ferreira</p>
+    <h1>Mapa de autoria e IA</h1>
+    <p class="hint">Escolha um capítulo e abra os tópicos para ver o que o guia ensina sobre usar recursos digitais e inteligência artificial com responsabilidade.</p>
+  </header>
+
+  <section class="map" aria-label="Mapa do eBook">
+    <div class="left">
+      <div class="root">
+        <h2>Autoria e uso responsável de recursos digitais e IA</h2>
+        <p>Um guia prático para estudantes e educadores na era da criação aumentada.</p>
+      </div>
+      <div class="link" aria-hidden="true"></div>
+      <ul class="chapters" id="chapters"></ul>
+    </div>
+    <article class="panel" id="panel" aria-live="polite"></article>
+  </section>
+
+  <p class="foot">Baseado no eBook “Autoria e uso responsável de recursos digitais e IA”. Referências do guia: Lei nº 9.610/1998; Creative Commons, Sobre as licenças; G1 (Educação e Jornal Nacional, 2026); Wikimedia Commons.</p>
+</main>
+
+<script>
+(function () {
+  var DATA = [
+    {
+      n: 1, short: 'Criação aumentada', title: 'A nova era da “criação aumentada”',
+      sub: 'A IA como parceira de criação e o que muda no seu papel.',
+      topics: [
+        { t: 'O adeus à página em branco',
+          p: ['Durante séculos, o maior terror de estudantes, escritores e criadores foi a página em branco. Com a IA generativa, há um parceiro de brainstorming disponível 24 horas por dia.',
+              'Quase metade dos alunos no Brasil já usa IA para estudar, resumir textos e criar projetos. A tecnologia chegou às salas de aula e às casas mais rápido do que as instituições criaram regras claras para usá-la.'],
+          src: 'Fonte: G1, 8 set. 2026.' },
+        { t: 'De criador tradicional a diretor de orquestra',
+          p: ['Na criação tradicional, tudo parte do zero. Na criação aumentada, a IA gera rascunhos, ideias brutas e estruturas.',
+              'Você atua como diretor de orquestra: dita o ritmo, faz os cortes, afina os instrumentos e dá a alma ao projeto.'] },
+        { t: 'O desafio: curar, adaptar, refinar',
+          p: ['O desafio do século XXI deixou de ser produzir conteúdo em massa. Agora é curar, adaptar, refinar e dar contexto ao que a máquina gera.'] },
+        { t: 'O perigo invisível: plágio acidental',
+          p: ['Usar a IA no modo “copiar e colar”, sem filtro crítico, transforma ferramentas incríveis em máquinas de plágio acidental e fábricas de desinformação, as chamadas alucinações da IA.',
+              'Aceitar o que a máquina diz como verdade absoluta, ou usar material protegido por direitos autorais sem permissão, é uma falha ética. Sua principal habilidade deve ser o pensamento crítico.'] }
+      ]
+    },
+    {
+      n: 2, short: 'Direitos autorais', title: 'Navegando pelos direitos autorais',
+      sub: 'O que você pode, e o que não pode, usar do que encontra na internet.',
+      topics: [
+        { t: 'O mito da internet livre',
+          p: ['Muita gente acredita que tudo o que está na internet é público e de graça. Por predefinição, quase todo conteúdo digital é protegido por Copyright, e copiar, modificar ou redistribuir sem autorização expressa é ilegal.',
+              'O letramento digital não existe para restringir o acesso à informação. Ele ensina a consumir e produzir respeitando o esforço criativo de terceiros.'] },
+        { t: 'A revolução do Creative Commons',
+          p: ['As licenças Creative Commons (CC) surgiram para resolver o impasse entre o rigor do direito tradicional e a necessidade de partilha na internet. Foram criadas por uma organização sem fins lucrativos.',
+              'O autor mantém seus direitos, mas cede antecipadamente algumas permissões ao público, de forma padronizada.'] },
+        { t: 'As siglas das licenças',
+          p: ['Ao pesquisar materiais, procure estas variações:'],
+          items: [
+            { k: 'BY', t: 'Atribuição: exige que você dê crédito ao autor original da obra.' },
+            { k: 'NC', t: 'Uso não comercial: proíbe o uso para fins comerciais ou lucrativos.' },
+            { k: 'ND', t: 'Sem obras derivadas: não permite modificar, adaptar ou alterar o conteúdo original.' },
+            { k: 'SA', t: 'Compartilhamento pela mesma licença: obras derivadas devem usar a exata licença da obra original.' }
+          ] },
+        { t: 'CC0 e o poder do domínio público',
+          p: ['Para fins educacionais, a categoria mais preciosa é a CC0. O criador renuncia voluntariamente aos direitos patrimoniais e coloca a obra no domínio público global.',
+              'Você pode usar, modificar, adaptar e redistribuir o material em qualquer projeto escolar ou acadêmico, com total liberdade e segurança jurídica. O Wikimedia Commons reúne centenas de milhares de imagens e mídias com essas diretrizes livres.'] }
+      ]
+    },
+    {
+      n: 3, short: 'Tríade da citação', title: 'A tríade da citação',
+      sub: 'Três elementos para citar qualquer fonte, humana ou digital.',
+      topics: [
+        { t: 'Transparência como regra de ouro',
+          p: ['A credibilidade de um trabalho acadêmico ou técnico se apoia na honestidade intelectual. Ao usar textos, imagens, códigos ou análises geradas por IA, a transparência passa a ser obrigação ética.',
+              'Dar crédito não diminui o valor do seu esforço. Demonstra rigor científico e respeito pelas fontes da pesquisa.'] },
+        { t: 'Os três pilares da citação correta',
+          p: ['Para evitar plágio acidental e opacidade metodológica, inclua sempre estes elementos:'],
+          items: [
+            { k: 'Autor', t: 'Quem concebeu a obra: uma pessoa, uma instituição ou a ferramenta de IA usada, como ChatGPT ou OpenAI.' },
+            { k: 'Fonte', t: 'O link direto, a URL de acesso, o título da publicação ou o repositório oficial onde o material está.' },
+            { k: 'Data de acesso', t: 'O dia, o mês e o ano em que você consultou a informação, para garantir a rastreabilidade temporal do estudo.' }
+          ] },
+        { t: 'O caso especial das ferramentas de IA',
+          p: ['Ao usar assistentes de IA para gerar rascunhos, resumir referências ou estruturar raciocínios, documente como a tecnologia entrou no processo. Indique a ferramenta e os principais prompts, no início do trabalho ou nas notas metodológicas.',
+              'A IA acelera o fluxo criativo como um co-piloto, mas a autoria intelectual e a responsabilidade final pertencem a quem comanda a pesquisa.'] }
+      ]
+    },
+    {
+      n: 4, short: 'IA como co-piloto', title: 'A inteligência artificial como co-piloto',
+      sub: 'Limites claros para usar a IA no dia a dia acadêmico.',
+      topics: [
+        { t: 'Extensão do pensamento, não substituta',
+          p: ['A chegada da IA generativa à educação provocou reações extremas, do pânico de que os estudantes deixem de pensar à tentação de delegar tudo aos algoritmos. O caminho sustentável fica no meio: a IA é um co-piloto, não um piloto automático.',
+              'Assim como a calculadora não substitui a compreensão da matemática, a IA serve para otimizar fluxos e nunca para anular o esforço cognitivo humano.'] },
+        { t: 'O que fazer: boas práticas',
+          items: [
+            { k: 'Ideação', wide: true, t: 'Brainstorming: desbloquear ideias iniciais, sugerir tópicos de estudo e propor estruturas para projetos.' },
+            { k: 'Revisão', wide: true, t: 'Aprimoramento: identificar erros gramaticais, reescrever frases confusas e ganhar clareza no texto.' },
+            { k: 'Explicação', wide: true, t: 'Conceitos complexos: pedir que a IA simplifique temas densos, como um tutor particular sob demanda.' }
+          ] },
+        { t: 'O que nunca fazer: condutas inadequadas',
+          items: [
+            { k: 'Cópia integral', wide: true, t: 'Submissão cega: apresentar como criação estritamente humana um trabalho gerado de ponta a ponta por máquina.' },
+            { k: 'Sem fact-checking', wide: true, t: 'Confiar cegamente na IA sem verificar fontes primárias, o que espalha alucinações, informações falsas inventadas pelo modelo.' },
+            { k: 'Privacidade', wide: true, t: 'Inserir dados sensíveis, confidenciais ou de terceiros em plataformas públicas de IA sem os devidos cuidados éticos.' }
+          ] },
+        { t: 'O papel do letramento digital',
+          p: ['Dominar ferramentas digitais vai além de saber digitar um comando. O verdadeiro letramento digital envolve questionar o resultado, cruzar dados, exigir transparência e manter a integridade intelectual em todas as etapas da aprendizagem.'] }
+      ]
+    },
+    {
+      n: 5, short: 'Responsabilidade humana', title: 'A responsabilidade é sempre humana',
+      sub: 'Quem responde pelo trabalho entregue.',
+      topics: [
+        { t: 'A máquina não responde por nada',
+          p: ['A IA não possui responsabilidade legal, moral ou ética. Ela não assina trabalhos, não responde perante comitês acadêmicos e não compreende o impacto social das suas respostas.',
+              'Ela atua como um co-piloto extraordinário, mas o controle do veículo continua inteiramente nas suas mãos.'] },
+        { t: 'O veredicto: 100% humana',
+          p: ['Seja com conteúdos de terceiros referenciados pela tríade da citação, seja com rascunhos feitos com ajuda de assistentes inteligentes, a responsabilidade final pela veracidade, pela ética, pela originalidade e pela qualidade do trabalho entregue é sempre 100% humana.'] },
+        { t: 'Uma ponte para a inovação',
+          p: ['Use a tecnologia não como atalho para a cópia, mas como ponte para a inovação consciente e responsável.'] }
+      ]
+    }
+  ];
+
+  var chapEl = document.getElementById('chapters');
+  var panel = document.getElementById('panel');
+  var cur = -1;
+
+  var chevron = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  var arrow = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+
+  chapEl.innerHTML = DATA.map(function (c, i) {
+    return '<li><button type="button" class="chap" data-i="' + i + '" aria-controls="panel">' +
+      '<span class="badge">' + c.n + '</span><span class="chap-label">' + c.short + '</span>' + arrow + '</button></li>';
+  }).join('');
+
+  function topicHtml(t, j) {
+    var open = j === 0;
+    var body = '';
+    if (t.p) body += t.p.map(function (x) { return '<p>' + x + '</p>'; }).join('');
+    if (t.items) {
+      body += '<ul class="items">' + t.items.map(function (it) {
+        return '<li' + (it.wide ? ' class="wide"' : '') + '><span class="k">' + it.k + '</span><span>' + it.t + '</span></li>';
+      }).join('') + '</ul>';
+    }
+    if (t.src) body += '<p class="src">' + t.src + '</p>';
+    return '<li class="topic' + (open ? ' is-open' : '') + '">' +
+      '<h3><button type="button" class="topic-head" data-t="' + j + '" aria-expanded="' + open + '" aria-controls="tb-' + j + '">' +
+      '<span class="topic-title">' + t.t + '</span>' + chevron + '</button></h3>' +
+      '<div class="topic-body" id="tb-' + j + '"' + (open ? '' : ' hidden') + '>' + body + '</div></li>';
+  }
+
+  function select(i) {
+    if (i === cur || i < 0 || i >= DATA.length) return;
+    cur = i;
+    var c = DATA[i];
+    Array.prototype.forEach.call(chapEl.querySelectorAll('.chap'), function (b, k) {
+      if (k === i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current');
+    });
+    panel.innerHTML =
+      '<div class="panel-head"><p class="eyebrow">Capítulo ' + c.n + '</p><h2>' + c.title + '</h2><p>' + c.sub + '</p></div>' +
+      '<button type="button" class="toggle-all" id="toggleAll">Abrir todos os tópicos</button>' +
+      '<ul class="topics">' + c.topics.map(topicHtml).join('') + '</ul>';
+    panel.classList.remove('fade');
+    void panel.offsetWidth;
+    panel.classList.add('fade');
+    syncToggleLabel();
+  }
+
+  function setTopic(li, open) {
+    li.classList.toggle('is-open', open);
+    li.querySelector('.topic-head').setAttribute('aria-expanded', String(open));
+    li.querySelector('.topic-body').hidden = !open;
+  }
+
+  function syncToggleLabel() {
+    var all = panel.querySelectorAll('.topic');
+    var openCount = panel.querySelectorAll('.topic.is-open').length;
+    var btn = document.getElementById('toggleAll');
+    if (btn) btn.textContent = openCount === all.length ? 'Recolher todos os tópicos' : 'Abrir todos os tópicos';
+  }
+
+  chapEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.chap');
+    if (!b) return;
+    var i = Number(b.getAttribute('data-i'));
+    select(i);
+    try { location.hash = 'cap-' + (i + 1); } catch (err) {}
+  });
+
+  panel.addEventListener('click', function (e) {
+    var head = e.target.closest('.topic-head');
+    if (head) {
+      var li = head.closest('.topic');
+      setTopic(li, !li.classList.contains('is-open'));
+      syncToggleLabel();
+      return;
+    }
+    if (e.target.closest('#toggleAll')) {
+      var items = panel.querySelectorAll('.topic');
+      var allOpen = panel.querySelectorAll('.topic.is-open').length === items.length;
+      Array.prototype.forEach.call(items, function (li) { setTopic(li, !allOpen); });
+      syncToggleLabel();
+    }
+  });
+
+  function fromHash() {
+    var m = /^#cap-([1-5])$/.exec(location.hash || '');
+    return m ? Number(m[1]) - 1 : 0;
+  }
+  window.addEventListener('hashchange', function () { select(fromHash()); });
+  select(fromHash());
+})();
+</script>
+
+</body></html>

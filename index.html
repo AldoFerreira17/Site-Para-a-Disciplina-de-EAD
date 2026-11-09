@@ -4,249 +4,276 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minicurso: Autoria e IA</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Paleta extraída do ebook: cinza claro, laranja-âmbar dos círculos e preto do texto */
         :root {
-            --primary-color: #0284c7;
-            --hover-color: #0369a1;
-            --text-main: #334155;
-            --text-dark: #0f172a;
-            --bg-light: #f8fafc;
+            --bg: #F0F0F0;
+            --surface: #FFFFFF;
+            --accent: #FFBD59;
+            --accent-hover: #FFAE33;
+            --accent-ink: #8A5200;   /* laranja escuro para texto/links sobre branco (contraste) */
+            --soft: #FFF1D6;
+            --ink: #141414;
+            --muted: #4A4A4A;
+            --line: #D4D4D4;
+            --font-display: 'Bricolage Grotesque', 'DM Sans', system-ui, sans-serif;
+            --font-body: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
         }
-        
-        body { 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 40px 20px; 
-            background: linear-gradient(135deg, #e0f2fe 0%, #93c5fd 100%); 
-            color: var(--text-main);
+
+        *, *::before, *::after { box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            margin: 0;
+            padding: 40px 20px;
+            background: var(--bg);
+            color: var(--ink);
             min-height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start; 
+            align-items: flex-start;
+            position: relative;
+            overflow-x: hidden;
+            line-height: 1.55;
         }
 
-        .card { 
-            max-width: 800px; 
+        /* Círculos do ebook como moldura da página */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            background: var(--accent);
+            z-index: 0;
+            pointer-events: none;
+        }
+        body::before { width: 340px; height: 340px; left: -190px; top: 120px; }
+        body::after  { width: 300px; height: 300px; right: -170px; bottom: -120px; }
+
+        :focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
             width: 100%;
-            background: #ffffff; 
-            padding: 45px; 
-            border-radius: 24px; 
-            box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15); 
+            background: var(--surface);
+            padding: 45px;
+            border-radius: 20px;
+            border: 1px solid var(--line);
         }
 
         .header { text-align: center; margin-bottom: 35px; }
 
         .tag {
             display: inline-block;
-            background-color: #e0f2fe;
-            color: var(--primary-color);
+            background-color: var(--accent);
+            color: var(--ink);
             padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.85em;
-            font-weight: 800;
+            font-weight: 700;
             margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
         }
 
-        h1 { 
-            font-size: 2.4em; 
-            color: var(--text-dark);
+        h1 {
+            font-family: var(--font-display);
+            font-size: 2.4em;
+            color: var(--ink);
             margin: 0 0 15px 0;
-            line-height: 1.2;
+            line-height: 1.15;
             font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
-        .subtitle { 
-            font-size: 1.1em; 
-            line-height: 1.6; 
-            color: var(--text-main);
+        .subtitle {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: var(--muted);
             max-width: 700px;
             margin: 0 auto;
         }
 
-        /* Aqui está a correção para alinhar à esquerda de forma correta */
         .author-info {
             margin-top: 30px;
             padding: 15px 20px;
-            background-color: var(--bg-light);
+            background-color: var(--bg);
             border-radius: 8px;
-            display: block; 
-            text-align: left; 
+            display: block;
+            text-align: left;
             font-size: 0.95em;
-            color: var(--text-main);
-            border-left: 4px solid var(--primary-color);
+            color: var(--ink);
+            border-left: 4px solid var(--accent);
         }
+        .author-info p { margin: 5px 0; }
 
-        .author-info p {
-            margin: 5px 0;
-        }
-
-        /* Estilos dos Botões Expansíveis (Accordions) */
-        .accordion-group {
-            margin-bottom: 35px;
-        }
+        /* Accordions */
+        .accordion-group { margin-bottom: 35px; }
 
         details {
-            background: #ffffff;
-            border: 2px solid #e2e8f0;
+            background: var(--surface);
+            border: 2px solid var(--line);
             border-radius: 12px;
             margin-bottom: 12px;
             overflow: hidden;
-            transition: border-color 0.3s ease;
+            transition: border-color 0.2s ease;
         }
-
-        details:hover {
-            border-color: #bae6fd;
-        }
-
-        details[open] {
-            border-color: var(--primary-color);
-            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.1);
-        }
+        details:hover { border-color: var(--accent); }
+        details[open] { border-color: var(--accent); }
 
         summary {
             padding: 18px 20px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 1.05em;
-            color: var(--text-dark);
+            color: var(--ink);
             cursor: pointer;
-            list-style: none; 
+            list-style: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #f8fafc;
-            transition: background 0.3s ease;
+            background: var(--bg);
         }
-
-        summary::-webkit-details-marker {
-            display: none; 
-        }
-
-        summary:hover {
-            background: #f1f5f9;
-        }
-
+        summary::-webkit-details-marker { display: none; }
         summary::after {
             content: '+';
             font-size: 1.5em;
             font-weight: 400;
-            color: var(--primary-color);
-            transition: transform 0.3s ease;
+            color: var(--ink);
             line-height: 1;
         }
-
-        details[open] summary::after {
-            content: '−';
-            transform: rotate(180deg);
-        }
+        details[open] summary { background: var(--soft); }
+        details[open] summary::after { content: '−'; }
 
         .details-content {
             padding: 20px;
-            border-top: 1px solid #e2e8f0;
-            background: #ffffff;
+            border-top: 1px solid var(--line);
+            background: var(--surface);
             font-size: 0.95em;
             line-height: 1.6;
         }
+        .details-content p { margin: 0; }
+        .details-content ul { margin: 0; padding-left: 20px; }
+        .details-content li { margin-bottom: 12px; }
+        .details-content li:last-child { margin-bottom: 0; }
 
-        .details-content p {
-            margin: 0;
-        }
-
-        .details-content ul {
-            margin: 0;
-            padding-left: 20px;
-        }
-
-        .details-content li {
-            margin-bottom: 12px;
-        }
-        .details-content li:last-child {
-            margin-bottom: 0;
-        }
-        
         .details-content a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .details-content a:hover {
+            color: var(--accent-ink);
+            font-weight: 700;
             text-decoration: underline;
-            color: var(--hover-color);
+            text-underline-offset: 3px;
         }
+        .details-content a:hover { color: var(--ink); }
 
         .video-container {
             position: relative;
-            padding-bottom: 56.25%; 
+            padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
             border-radius: 16px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             margin-bottom: 35px;
+            border: 3px solid var(--ink);
         }
-
         .video-container iframe {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             border: none;
         }
 
         .actions { text-align: center; }
-
         .actions p {
-            margin-bottom: 20px;
-            font-weight: 600;
-            color: var(--text-dark);
+            margin: 0 0 20px;
+            font-weight: 700;
+            color: var(--ink);
         }
 
-        .btn { 
-            display: inline-block; 
-            padding: 16px 32px; 
-            background-color: var(--primary-color); 
-            color: #ffffff; 
-            text-decoration: none; 
-            border-radius: 50px; 
-            font-weight: 600;
+        .btn {
+            display: inline-block;
+            padding: 16px 32px;
+            background-color: var(--accent);
+            color: var(--ink);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
             font-size: 1.1em;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(2, 132, 199, 0.3);
+            transition: background-color 0.2s ease, transform 0.2s ease;
         }
+        .btn:hover { background-color: var(--accent-hover); transform: scale(1.04); }
 
-        .btn:hover { 
-            background-color: var(--hover-color); 
-            transform: scale(1.05); 
-            box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+        /* Materiais complementares (ebook + mapa) */
+        .materials {
+            margin-top: 40px;
+            padding-top: 35px;
+            border-top: 1px solid var(--line);
+            text-align: center;
         }
+        .materials h2 {
+            font-family: var(--font-display);
+            font-size: 1.5em;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            margin: 0 0 8px;
+        }
+        .materials > p {
+            margin: 0 0 24px;
+            color: var(--muted);
+        }
+        .material-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            text-align: left;
+        }
+        .material {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 22px;
+            border-radius: 16px;
+            text-decoration: none;
+            border: 2px solid var(--ink);
+            transition: transform 0.2s ease;
+        }
+        .material:hover { transform: translateY(-3px); }
+        .material .icon { font-size: 1.8em; line-height: 1; margin-bottom: 4px; }
+        .material strong { font-family: var(--font-display); font-size: 1.2em; }
+        .material span.desc { font-size: 0.92em; }
+        .material span.cta { margin-top: 10px; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+        .material.ebook { background: var(--accent); color: var(--ink); }
+        .material.map   { background: var(--ink); color: #F5F5F5; border-color: var(--ink); }
+        .material.map .cta { color: var(--accent); }
 
         .footer {
             margin-top: 40px;
             text-align: center;
             font-size: 0.9em;
-            color: #64748b;
-            border-top: 1px solid #e2e8f0;
+            color: var(--muted);
+            border-top: 1px solid var(--line);
             padding-top: 20px;
         }
-        
+
         @media (max-width: 768px) {
             body { padding: 20px 15px; }
             .card { padding: 25px 20px; }
             h1 { font-size: 1.8em; }
+            .material-options { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition: none !important; }
         }
     </style>
 </head>
 <body>
     <div class="card">
-        
+
         <div class="header">
             <span class="tag">💡 Minicurso EaD</span>
             <h1>Autoria e uso responsável de recursos digitais e IA</h1>
             <p class="subtitle">Descubra como utilizar materiais educacionais e ferramentas de Inteligência Artificial com ética, atenção às fontes e transparência nos seus estudos e projetos.</p>
-            
+
             <div class="author-info">
                 <p><strong>Autor:</strong> Aldo Ferreira</p>
                 <p><strong>Curso:</strong> Licenciatura em Computação</p>
@@ -291,7 +318,7 @@
         </div>
 
         <div class="video-container">
-            <iframe src="https://www.youtube.com/embed/lQ4g4aHptE0" allowfullscreen></iframe>
+            <iframe src="https://www.youtube.com/embed/lQ4g4aHptE0" title="Videoaula: Autoria e uso responsável de recursos digitais e IA" allowfullscreen></iframe>
         </div>
 
         <div class="accordion-group">
@@ -299,10 +326,10 @@
                 <summary>🔗 Material Auxiliar (Leituras e Fontes)</summary>
                 <div class="details-content">
                     <ul>
-                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/04/21/universidades-estabelecem-regras-para-o-uso-de-ia-na-educacao.ghtml" target="_blank">G1: Universidades estabelecem regras para o uso de IA na educação</a></li>
-                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/08/04/nas-escolas-brasileiras-pesquisadores-medem-impacto-da-inteligencia-artificial-na-vida-de-alunos-e-professores.ghtml" target="_blank">G1: Pesquisadores medem impacto da Inteligência Artificial na vida de alunos e professores</a></li>
-                        <li><a href="https://g1.globo.com/educacao/noticia/2026/09/08/quase-metade-dos-alunos-no-brasil-usa-chatbots-de-ia-para-estudar-indice-e-maior-do-que-em-paises-da-ocde.ghtml" target="_blank">G1: Quase metade dos alunos no Brasil usa chatbots de IA para estudar</a></li>
-                        <li><a href="http://commons.wikimedia.org/wiki/Main_Page" target="_blank">Wikimedia Commons: Repositório de mídias com licenças livres</a></li>
+                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/04/21/universidades-estabelecem-regras-para-o-uso-de-ia-na-educacao.ghtml" target="_blank" rel="noopener">G1: Universidades estabelecem regras para o uso de IA na educação</a></li>
+                        <li><a href="https://g1.globo.com/jornal-nacional/noticia/2026/08/04/nas-escolas-brasileiras-pesquisadores-medem-impacto-da-inteligencia-artificial-na-vida-de-alunos-e-professores.ghtml" target="_blank" rel="noopener">G1: Pesquisadores medem impacto da Inteligência Artificial na vida de alunos e professores</a></li>
+                        <li><a href="https://g1.globo.com/educacao/noticia/2026/09/08/quase-metade-dos-alunos-no-brasil-usa-chatbots-de-ia-para-estudar-indice-e-maior-do-que-em-paises-da-ocde.ghtml" target="_blank" rel="noopener">G1: Quase metade dos alunos no Brasil usa chatbots de IA para estudar</a></li>
+                        <li><a href="https://commons.wikimedia.org/wiki/Main_Page" target="_blank" rel="noopener">Wikimedia Commons: Repositório de mídias com licenças livres</a></li>
                     </ul>
                 </div>
             </details>
@@ -310,8 +337,27 @@
 
         <div class="actions">
             <p>Concluiu a videoaula e as leituras? Valide seus conhecimentos abaixo:</p>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJL6fSDQj3z612PrHwA7Db6I4vCOVvsAZLwkJDj4O8Lxn4tg/viewform" target="_blank" class="btn">Acessar Avaliação Interativa 🚀</a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJL6fSDQj3z612PrHwA7Db6I4vCOVvsAZLwkJDj4O8Lxn4tg/viewform" target="_blank" rel="noopener" class="btn">Acessar Avaliação Interativa 🚀</a>
         </div>
+
+        <section class="materials" aria-labelledby="materiais-titulo">
+            <h2 id="materiais-titulo">Continue estudando</h2>
+            <p>Dois materiais para revisar o conteúdo no seu ritmo.</p>
+            <div class="material-options">
+                <a class="material ebook" href="ebook-autoria-ia.pdf" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">📖</span>
+                    <strong>Ebook em PDF</strong>
+                    <span class="desc">Guia prático com licenças Creative Commons, Tríade da Citação e boas práticas com IA.</span>
+                    <span class="cta">Abrir ebook</span>
+                </a>
+                <a class="material map" href="mapa-autoria-ia.html" target="_blank" rel="noopener">
+                    <span class="icon" aria-hidden="true">🗺️</span>
+                    <strong>Mapa interativo</strong>
+                    <span class="desc">Veja os cinco capítulos do curso em um só lugar e explore cada tópico.</span>
+                    <span class="cta">Abrir mapa</span>
+                </a>
+            </div>
+        </section>
 
         <div class="footer">
             Desenvolvido para a Disciplina de EaD | 2026
